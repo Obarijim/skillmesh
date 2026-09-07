@@ -1,0 +1,21 @@
+# --- Core API ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.5
+pydantic-settings==2.7.1
+
+# --- Database (PostgreSQL) ---
+sqlalchemy==2.0.37
+psycopg2-binary==2.9.10
+alembic==1.14.1
+
+# --- Dev / test / lint ---
+pytest==8.3.5
+httpx==0.28.1
+ruff==0.9.4
+
+# --- AI / NLP module (semantic matching) ---
+# Intentionally NOT pinned/installed yet — this step is just the project
+# structure. When the matching module is built, add e.g.:
+#   sentence-transformers
+#   spacy

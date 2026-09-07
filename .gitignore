@@ -1,0 +1,30 @@
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Node / client ---
+client/node_modules/
+client/dist/
+client/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Python / server ---
+server/.venv/
+server/venv/
+server/__pycache__/
+server/**/__pycache__/
+server/*.pyc
+server/.pytest_cache/
+server/.mypy_cache/
+server/.ruff_cache/
+*.egg-info/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
