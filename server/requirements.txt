@@ -6,7 +6,7 @@ pydantic-settings==2.7.1
 
 # --- Database (PostgreSQL) ---
 sqlalchemy==2.0.37
-psycopg2-binary==2.9.10
+   psycopg[binary]>=3.2,<4.0
 alembic==1.14.1
 
 # --- Dev / test / lint ---
@@ -19,3 +19,6 @@ ruff==0.9.4
 # structure. When the matching module is built, add e.g.:
 #   sentence-transformers
 #   spacy
+authlib
+httpx
+itsdangerous
