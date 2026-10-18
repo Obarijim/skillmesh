@@ -1,0 +1,32 @@
+export const mockSaved = [
+  {
+    id: 1,
+    title: "Frontend Developer Intern",
+    company: "Cortex Interactive",
+    location: "Cebu, hybrid",
+    score: 84,
+    status: "applied",
+    statusLabel: "Applied \u00b7 2 days ago",
+    note: "Closes in 11 days. Stipend \u20b118\u201322k.",
+  },
+  {
+    id: 2,
+    title: "Junior Web Developer",
+    company: "Northwind Digital",
+    location: "remote",
+    score: 79,
+    status: "not_applied",
+    statusLabel: "Not applied",
+    note: "Score rose from 74 after you added CSS detail.",
+  },
+  {
+    id: 3,
+    title: "UI Developer (React)",
+    company: "Arcadia Health IT",
+    location: "Manila",
+    score: 76,
+    status: "closing",
+    statusLabel: "Closing in 2 days",
+    note: "Asks for 2 years experience \u2014 the one thing you can't meet.",
+  },
+]
