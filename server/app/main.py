@@ -10,11 +10,11 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
 
-DATABASE_URL = os.environ["DATABASE_URL"]
-SESSION_SECRET = os.environ["SESSION_SECRET"]
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./test.db")
+SESSION_SECRET = os.environ.get("SESSION_SECRET", "dev-only-secret-change-me")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-FRONTEND_URL = os.environ["FRONTEND_URL"]
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 ENV = os.environ.get("ENV", "development")
 
 engine = create_engine(DATABASE_URL)
