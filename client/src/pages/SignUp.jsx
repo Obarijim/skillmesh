@@ -2,15 +2,16 @@ import { useState } from 'react'
 import AuthTopBar from '../components/AuthTopBar'
 import { OAuthButton, Field, PasswordStrength } from '../components/AuthBits'
 import { API_BASE_URL } from '../config'
+import { startAnonymousSession } from '../api'
 
 // Screen 02 — Sign up
 function SignUp() {
   const [password, setPassword] = useState('')
 
-  async function continueAnonymously() {
-    await fetch(`${API_BASE_URL}/auth/session`, { method: 'POST', credentials: 'include' })
-    window.location.href = '/profile'
-  }
+async function continueAnonymously() {
+  await startAnonymousSession()
+  window.location.href = '/profile'
+}
 
   return (
     <>

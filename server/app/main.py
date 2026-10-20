@@ -1,11 +1,22 @@
+import io
 import os
 import uuid
 from datetime import datetime
 
+import pdfplumber
 from authlib.integrations.starlette_client import OAuth
-from fastapi import FastAPI, Request
+from docx import Document
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import Column, DateTime, Integer, String, create_engine
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    create_engine,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
@@ -28,6 +39,15 @@ class User(Base):
     email = Column(String, unique=True, nullable=True)
     google_sub = Column(String, unique=True, nullable=True)
     session_id = Column(String, unique=True, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class CVUpload(Base):
+    __tablename__ = "cv_uploads"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    filename = Column(String, nullable=False)
+    raw_text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -111,3 +131,52 @@ def create_anonymous_session(request: Request):
 def me(request: Request):
     user_id = request.session.get("user_id")
     return {"authenticated": bool(user_id), "user_id": user_id}
+
+
+def extract_text_from_pdf(file_bytes: bytes) -> str:
+    text_parts = []
+    with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text_parts.append(page_text)
+    return "\n".join(text_parts)
+
+
+def extract_text_from_docx(file_bytes: bytes) -> str:
+    document = Document(io.BytesIO(file_bytes))
+    return "\n".join(paragraph.text for paragraph in document.paragraphs)
+
+
+@app.post("/api/cv/upload")
+async def upload_cv(request: Request, file: UploadFile = File(...)):  # noqa: B008
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Sign in before uploading a CV")
+
+    filename = file.filename or ""
+    lower_name = filename.lower()
+    file_bytes = await file.read()
+
+    if lower_name.endswith(".pdf"):
+        raw_text = extract_text_from_pdf(file_bytes)
+    elif lower_name.endswith(".docx"):
+        raw_text = extract_text_from_docx(file_bytes)
+    else:
+        raise HTTPException(status_code=400, detail="Only .pdf and .docx files are supported")
+
+    if not raw_text.strip():
+        raise HTTPException(status_code=422, detail="No readable text found in this file")
+
+    db = SessionLocal()
+    cv_upload = CVUpload(user_id=user_id, filename=filename, raw_text=raw_text)
+    db.add(cv_upload)
+    db.commit()
+    db.refresh(cv_upload)
+    db.close()
+
+    return {
+        "id": cv_upload.id,
+        "filename": cv_upload.filename,
+        "characters_extracted": len(raw_text),
+    }

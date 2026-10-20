@@ -2,13 +2,14 @@ import { Link } from 'react-router-dom'
 import AuthTopBar from '../components/AuthTopBar'
 import { OAuthButton, Field } from '../components/AuthBits'
 import { API_BASE_URL } from '../config'
+import { startAnonymousSession } from '../api'
 
 // Screen 03 — Log in
 function Login() {
   async function continueAnonymously() {
-    await fetch(`${API_BASE_URL}/auth/session`, { method: 'POST', credentials: 'include' })
-    window.location.href = '/profile'
-  }
+  await startAnonymousSession()
+  window.location.href = '/profile'
+}
 
   return (
     <>

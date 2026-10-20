@@ -22,3 +22,5 @@ ruff==0.9.4
 authlib
 httpx
 itsdangerous
+pdfplumber
+python-docx

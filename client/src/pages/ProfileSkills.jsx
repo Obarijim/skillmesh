@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
+import { uploadResume } from '../api'
 
 const SKILL_SUGGESTIONS = [
   { name: 'Typescript', note: 'typed superset of Javascript' },
@@ -17,10 +18,36 @@ const RESUME_SKILLS = [
 // Screen 04 — Profile, skills
 function ProfileSkills() {
   const [query, setQuery] = useState('')
+  const [resumeFile, setResumeFile] = useState(null)
+  const [uploadStatus, setUploadStatus] = useState(null)
+  const fileInputRef = useRef(null)
+
   const suggestions =
     query.trim().length > 0
       ? SKILL_SUGGESTIONS.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
       : []
+
+  function handleReplaceClick() {
+    fileInputRef.current?.click()
+  }
+
+  async function handleFileChange(e) {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setResumeFile(file)
+    setUploadStatus('uploading')
+
+    try {
+      const result = await uploadResume(file)
+      setUploadStatus({ ok: true, characters: result.characters_extracted })
+    } catch (err) {
+      setUploadStatus({ ok: false, error: err.message })
+    }
+  }
+
+  const displayName = resumeFile ? resumeFile.name : 'reyes_juan_cv.pdf'
+  const displaySize = resumeFile ? `${Math.max(1, Math.round(resumeFile.size / 1024))} KB` : '184 KB'
 
   return (
     <>
@@ -56,15 +83,41 @@ function ProfileSkills() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: 'var(--space-lg)',
+                marginBottom: 'var(--space-md)',
               }}
             >
               <div>
-                <div style={{ fontWeight: 600 }}>reyes_juan_cv.pdf</div>
-                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>2 pages &middot; 184 KB</div>
+                <div style={{ fontWeight: 600 }}>{displayName}</div>
+                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>{displaySize}</div>
               </div>
-              <span style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', cursor: 'pointer' }}>Replace</span>
+              <span onClick={handleReplaceClick} style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)', cursor: 'pointer' }}>
+                {resumeFile ? 'Replace' : 'Upload'}
+              </span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.docx"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
             </div>
+
+            {uploadStatus === 'uploading' && (
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-md)' }}>
+                Uploading and extracting text…
+              </p>
+            )}
+            {uploadStatus && uploadStatus.ok === true && (
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', marginBottom: 'var(--space-md)' }}>
+                Resume processed — {uploadStatus.characters} characters of text extracted and stored. (Skill
+                extraction from this text arrives in Week 4 — the panel on the right is still example data.)
+              </p>
+            )}
+            {uploadStatus && uploadStatus.ok === false && (
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-danger)', marginBottom: 'var(--space-md)' }}>
+                Couldn't process that file: {uploadStatus.error}
+              </p>
+            )}
 
             <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 600, marginBottom: 6 }}>
               Add a skill
