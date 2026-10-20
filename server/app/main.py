@@ -60,8 +60,13 @@ if GOOGLE_CLIENT_ID:
     )
 
 
-@app.get("/api/health")
-def health():
+@app.get("/")
+def root():
+    return {"message": "SkillMesh API is running. See /docs for the API reference."}
+
+
+@app.get("/health")
+def health_check():
     return {"status": "ok"}
 
 
