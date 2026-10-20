@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom'
 import AuthTopBar from '../components/AuthTopBar'
 import { OAuthButton, Field } from '../components/AuthBits'
+import { API_BASE_URL } from '../config'
 
 // Screen 03 — Log in
 function Login() {
+  async function continueAnonymously() {
+    await fetch(`${API_BASE_URL}/auth/session`, { method: 'POST', credentials: 'include' })
+    window.location.href = '/profile'
+  }
+
   return (
     <>
       <AuthTopBar prompt="New here?" linkLabel="Sign up" linkTo="/signup" />
@@ -25,7 +31,7 @@ function Login() {
               boxShadow: 'var(--shadow-card)',
             }}
           >
-            <OAuthButton label="Continue with Google" />
+            <OAuthButton label="Continue with Google" href={`${API_BASE_URL}/auth/google/login`} />
             <OAuthButton label="Continue with GitHub" />
 
             <div
@@ -73,6 +79,24 @@ function Login() {
               }}
             >
               Log in
+            </button>
+
+            <button
+              type="button"
+              onClick={continueAnonymously}
+              style={{
+                width: '100%',
+                backgroundColor: 'transparent',
+                color: 'var(--color-text-muted)',
+                border: 'none',
+                padding: '10px',
+                marginTop: 'var(--space-sm)',
+                fontSize: 'var(--font-size-xs)',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+              }}
+            >
+              Continue without signing in
             </button>
           </div>
         </div>

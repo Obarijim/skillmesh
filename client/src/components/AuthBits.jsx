@@ -1,32 +1,34 @@
-export function OAuthButton({ label }) {
-  return (
-    <button
-      type="button"
+export function OAuthButton({ label, href }) {
+  const style = {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-sm)',
+    backgroundColor: 'var(--color-bg)',
+    border: '1px solid var(--color-border)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '10px var(--space-md)',
+    marginBottom: 'var(--space-sm)',
+    cursor: 'pointer',
+    fontSize: 'var(--font-size-sm)',
+    textDecoration: 'none',
+    color: 'var(--color-text)',
+  }
+  const dot = (
+    <span
       style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 'var(--space-sm)',
-        backgroundColor: 'var(--color-bg)',
+        width: 18,
+        height: 18,
+        borderRadius: '50%',
+        backgroundColor: 'var(--color-bg-subtle)',
         border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-sm)',
-        padding: '10px var(--space-md)',
-        marginBottom: 'var(--space-sm)',
-        cursor: 'pointer',
-        fontSize: 'var(--font-size-sm)',
       }}
-    >
-      <span
-        style={{
-          width: 18,
-          height: 18,
-          borderRadius: '50%',
-          backgroundColor: 'var(--color-bg-subtle)',
-          border: '1px solid var(--color-border)',
-        }}
-      />
-      {label}
-    </button>
+    />
+  )
+  return href ? (
+    <a href={href} style={style}>{dot}{label}</a>
+  ) : (
+    <button type="button" style={style}>{dot}{label}</button>
   )
 }
 

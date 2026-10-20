@@ -1,10 +1,16 @@
 import { useState } from 'react'
 import AuthTopBar from '../components/AuthTopBar'
 import { OAuthButton, Field, PasswordStrength } from '../components/AuthBits'
+import { API_BASE_URL } from '../config'
 
 // Screen 02 — Sign up
 function SignUp() {
   const [password, setPassword] = useState('')
+
+  async function continueAnonymously() {
+    await fetch(`${API_BASE_URL}/auth/session`, { method: 'POST', credentials: 'include' })
+    window.location.href = '/profile'
+  }
 
   return (
     <>
@@ -27,7 +33,7 @@ function SignUp() {
               boxShadow: 'var(--shadow-card)',
             }}
           >
-            <OAuthButton label="Continue with Google" />
+            <OAuthButton label="Continue with Google" href={`${API_BASE_URL}/auth/google/login`} />
             <OAuthButton label="Continue with GitHub" />
 
             <div
@@ -74,6 +80,24 @@ function SignUp() {
               }}
             >
               Create account
+            </button>
+
+            <button
+              type="button"
+              onClick={continueAnonymously}
+              style={{
+                width: '100%',
+                backgroundColor: 'transparent',
+                color: 'var(--color-text-muted)',
+                border: 'none',
+                padding: '10px',
+                marginTop: 'var(--space-sm)',
+                fontSize: 'var(--font-size-xs)',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+              }}
+            >
+              Continue without signing in
             </button>
           </div>
 
