@@ -2,19 +2,19 @@ import os
 import uuid
 from datetime import datetime
 
+from authlib.integrations.starlette_client import OAuth
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import Column, DateTime, Integer, String, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuth
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.orm import sessionmaker, declarative_base
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 SESSION_SECRET = os.environ["SESSION_SECRET"]
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-FRONTEND_URL = os.environ["FRONTEND_URL"]       # e.g. https://skillmesh.vercel.app
+FRONTEND_URL = os.environ["FRONTEND_URL"]
 ENV = os.environ.get("ENV", "development")
 
 engine = create_engine(DATABASE_URL)
@@ -23,14 +23,11 @@ Base = declarative_base()
 
 
 class User(Base):
-    # Minimal table for today's objective only — the rest of the schema
-    # (CVProfiles, Skills, Jobs, Matches, JobSkills) is NOT built here.
-    # That's deliberate: today's job is deploy + a working sign-in, nothing more.
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=True)
-    google_sub = Column(String, unique=True, nullable=True)   # Google's permanent user id
-    session_id = Column(String, unique=True, nullable=True)   # used only by the no-login fallback
+    google_sub = Column(String, unique=True, nullable=True)
+    session_id = Column(String, unique=True, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -94,7 +91,6 @@ async def google_callback(request: Request):
 
 @app.post("/auth/session")
 def create_anonymous_session(request: Request):
-    """Fallback only: no identity check at all, just hands out a session."""
     db = SessionLocal()
     user = User(session_id=str(uuid.uuid4()))
     db.add(user)
