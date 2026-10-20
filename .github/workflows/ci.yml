@@ -54,6 +54,6 @@ jobs:
       - name: Test
         working-directory: server
         env:
-          DATABASE_URL: postgresql+psycopg2://skillmesh:skillmesh@localhost:5432/skillmesh
-          SECRET_KEY: ci-test-secret
+          DATABASE_URL: sqlite:///./test.db
+          SESSION_SECRET: ci-test-secret
         run: pytest -q
